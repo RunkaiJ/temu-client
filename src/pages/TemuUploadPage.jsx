@@ -43,7 +43,11 @@ function TemuUploadPage() {
             const formData = new FormData();
             formData.append("template", templateFile);
             formData.append("combine", combineFile);
-            formData.append("form", JSON.stringify(form));
+            formData.append(
+                "form",
+                new Blob([JSON.stringify(form)], { type: "application/json" })
+            );
+
 
             const response = await axios.post(
                 "https://temu-server-2277.onrender.com/api/convert",
