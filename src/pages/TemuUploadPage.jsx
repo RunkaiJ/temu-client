@@ -43,10 +43,8 @@ function TemuUploadPage() {
             const formData = new FormData();
             formData.append("template", templateFile);
             formData.append("combine", combineFile);
-            formData.append(
-                "form",
-                new Blob([JSON.stringify(form)], { type: "application/json" })
-            );
+            formData.append("form", JSON.stringify(form));
+
 
             const response = await axios.post(
                 "https://temu-server-production.up.railway.app/api/convert",
