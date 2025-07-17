@@ -50,7 +50,7 @@ function TemuUploadPage() {
 
 
             const response = await axios.post(
-                "https://temu-server-2277.onrender.com/api/convert",
+                "https://temu-server-production.up.railway.app/api/convert",
                 formData,
                 {
                     responseType: "blob",
