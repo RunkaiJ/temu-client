@@ -48,13 +48,12 @@ function TemuUploadPage() {
                 new Blob([JSON.stringify(form)], { type: "application/json" })
             );
 
-
             const response = await axios.post(
                 "https://temu-server-production.up.railway.app/api/convert",
                 formData,
                 {
                     responseType: "blob",
-                    headers: { "Content-Type": "multipart/form-data" },
+                    // headers: { "Content-Type": "multipart/form-data" },
                 }
             );
 
