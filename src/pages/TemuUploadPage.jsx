@@ -46,23 +46,33 @@ function TemuUploadPage() {
             formData.append("form", JSON.stringify(form));
 
 
-            const response = await axios.post(
-                "https://temu-server-production.up.railway.app/api/convert",
-                formData,
-                {
-                    responseType: "blob",
-                    // headers: { "Content-Type": "multipart/form-data" },
-                }
-            );
+        const response = await axios.post(
+            "https://temu-server-production.up.railway.app/api/convert",
+            formData,
+            {
+                responseType: "blob",
+            }
+        );
 
-            const blob = new Blob([response.data], {
-                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            });
+        // 🔍 Extract filename from headers
+        const contentDisposition = response.headers["content-disposition"];
+        let filename = "download.xlsx"; // default fallback
+        if (contentDisposition) {
+            const match = contentDisposition.match(/filename="?(.+?)"?$/);
+            if (match) {
+                filename = match[1];
+            }
+        }
 
-            const link = document.createElement("a");
-            link.href = window.URL.createObjectURL(blob);
-            link.download = "27274824400 UPLOAD GENERATED.xlsx";
-            link.click();
+        const blob = new Blob([response.data], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+
 
             setStatus("✅ File successfully generated and downloaded.");
         } catch (err) {
