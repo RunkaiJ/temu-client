@@ -4,35 +4,25 @@ import axios from "axios";
 function TemuUploadPage() {
     const [form, setForm] = useState({
         date: "",
-        unladingPort: "",
-        arrivalAirport: "",
-        preparerPort: "",
-        remotePort: "",
+        portCode: "", // ← single port input
         destinationState: "",
-        locationOfGoods: "",
         carrierCode: "",
         voyageFlightNo: "",
         houseAWB: "",
     });
 
-    const [templateFile, setTemplateFile] = useState(null);
     const [combineFile, setCombineFile] = useState(null);
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e) =>
         setForm({ ...form, [e.target.name]: e.target.value });
-    };
 
-    const handleFileChange = (e, type) => {
-        const file = e.target.files[0];
-        if (type === "template") setTemplateFile(file);
-        else setCombineFile(file);
-    };
+    const handleFileChange = (e) => setCombineFile(e.target.files[0]);
 
     const handleSubmit = async () => {
-        if (!templateFile || !combineFile) {
-            alert("Please upload both files.");
+        if (!combineFile) {
+            alert("Please upload the Combine invoice file.");
             return;
         }
 
@@ -40,39 +30,31 @@ function TemuUploadPage() {
         setStatus("");
 
         try {
-            const formData = new FormData();
-            formData.append("template", templateFile);
-            formData.append("combine", combineFile);
-            formData.append("form", JSON.stringify(form));
-
-
-        const response = await axios.post(
-            "https://temu-server-production.up.railway.app/api/convert",
-            formData,
-            {
+            const fd = new FormData();
+            fd.append("combine", combineFile);
+            fd.append("form", JSON.stringify(form));
+            const localUrl = "http://localhost:5000/api/convert";
+            const onlineUrl =
+                "https://temu-server-production.up.railway.app/api/convert";
+            const response = await axios.post(localUrl, fd, {
                 responseType: "blob",
+            });
+
+            // read filename from header
+            const cd = response.headers["content-disposition"];
+            let filename = "download.xlsx";
+            if (cd) {
+                const m = cd.match(/filename="?(.+?)"?$/);
+                if (m) filename = m[1];
             }
-        );
 
-        // 🔍 Extract filename from headers
-        const contentDisposition = response.headers["content-disposition"];
-        let filename = "download.xlsx"; // default fallback
-        if (contentDisposition) {
-            const match = contentDisposition.match(/filename="?(.+?)"?$/);
-            if (match) {
-                filename = match[1];
-            }
-        }
-
-        const blob = new Blob([response.data], {
-            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        });
-
-        const link = document.createElement("a");
-        link.href = window.URL.createObjectURL(blob);
-        link.download = filename;
-        link.click();
-
+            const blob = new Blob([response.data], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
 
             setStatus("✅ File successfully generated and downloaded.");
         } catch (err) {
@@ -88,20 +70,11 @@ function TemuUploadPage() {
             <h3 className="mb-4">Temu Upload Generator</h3>
 
             <div className="mb-3">
-                <label className="form-label">Temu NetCHB Template</label>
-                <input
-                    type="file"
-                    className="form-control"
-                    onChange={(e) => handleFileChange(e, "template")}
-                />
-            </div>
-
-            <div className="mb-3">
                 <label className="form-label">Combine Invoice File</label>
                 <input
                     type="file"
                     className="form-control"
-                    onChange={(e) => handleFileChange(e, "combine")}
+                    onChange={handleFileChange}
                 />
             </div>
 
@@ -118,12 +91,11 @@ function TemuUploadPage() {
 
             <div className="row">
                 {[
-                    { name: "unladingPort", label: "Unlading Port" },
-                    { name: "arrivalAirport", label: "Arrival Airport" },
-                    { name: "preparerPort", label: "Preparer Port" },
-                    { name: "remotePort", label: "Remote Port" },
+                    {
+                        name: "portCode",
+                        label: "Port Code (used for Unlading/Arrival/Remote)",
+                    },
                     { name: "destinationState", label: "State of Destination" },
-                    { name: "locationOfGoods", label: "Location of Goods" },
                     { name: "carrierCode", label: "Carrier Code" },
                     { name: "voyageFlightNo", label: "Voyage Flight No" },
                     { name: "houseAWB", label: "House AWB" },
