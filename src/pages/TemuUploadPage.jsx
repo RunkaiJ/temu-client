@@ -36,7 +36,7 @@ function TemuUploadPage() {
             const localUrl = "http://localhost:5000/api/convert";
             const onlineUrl =
                 "https://temu-server-production.up.railway.app/api/convert";
-            const response = await axios.post(localUrl, fd, {
+            const response = await axios.post(onlineUrl, fd, {
                 responseType: "blob",
             });
 
