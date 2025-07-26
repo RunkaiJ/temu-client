@@ -128,8 +128,14 @@ function TemuUploadPage() {
 
             <div className="row">
                 {[
-                    { name: "airlineCode", label: "Airline Code (3-digit)" },
-                    { name: "masterBillNumber", label: "Master Bill Number" },
+                    {
+                        name: "airlineCode",
+                        label: "Airline Code (First 3 digits)",
+                    },
+                    {
+                        name: "masterBillNumber",
+                        label: "Master Bill Number (The rest)",
+                    },
                 ].map(({ name, label }) => (
                     <div className="col-md-6 mb-3" key={name}>
                         <label className="form-label">{label}</label>
