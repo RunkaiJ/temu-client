@@ -81,29 +81,55 @@ function TemuUploadPage() {
                 />
             </div>
 
-            <div className="mb-3">
-                <label className="form-label">Date for All Fields</label>
-                <input
-                    type="date"
-                    className="form-control"
-                    name="date"
-                    value={form.date}
-                    onChange={handleInputChange}
-                />
+            <div className="row">
+                <div className="col-md-6 mb-3">
+                    <label className="form-label">Date for All Fields</label>
+                    <input
+                        type="date"
+                        className="form-control"
+                        name="date"
+                        value={form.date}
+                        onChange={handleInputChange}
+                    />
+                </div>
+                <div className="col-md-6 mb-3">
+                    <label className="form-label">
+                        Port Code (for Unlading/Arrival/Remote)
+                    </label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        name="portCode"
+                        value={form.portCode}
+                        onChange={handleInputChange}
+                    />
+                </div>
             </div>
 
             <div className="row">
                 {[
-                    {
-                        name: "portCode",
-                        label: "Port Code (for Unlading/Arrival/Remote)",
-                    },
                     { name: "destinationState", label: "State of Destination" },
                     { name: "carrierCode", label: "Carrier Code" },
                     { name: "voyageFlightNo", label: "Voyage Flight No" },
                     { name: "houseAWB", label: "House AWB" },
-                    { name: "airlineCode", label: "Airline Code (3-digit)" }, // new
-                    { name: "masterBillNumber", label: "Master Bill Number" }, // new
+                ].map(({ name, label }) => (
+                    <div className="col-md-6 mb-3" key={name}>
+                        <label className="form-label">{label}</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            name={name}
+                            value={form[name]}
+                            onChange={handleInputChange}
+                        />
+                    </div>
+                ))}
+            </div>
+
+            <div className="row">
+                {[
+                    { name: "airlineCode", label: "Airline Code (3-digit)" },
+                    { name: "masterBillNumber", label: "Master Bill Number" },
                 ].map(({ name, label }) => (
                     <div className="col-md-6 mb-3" key={name}>
                         <label className="form-label">{label}</label>
