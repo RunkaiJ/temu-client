@@ -4,25 +4,27 @@ import axios from "axios";
 function TemuUploadPage() {
     const [form, setForm] = useState({
         date: "",
-        portCode: "", // ← single port input
+        portCode: "", // single port code
         destinationState: "",
         carrierCode: "",
         voyageFlightNo: "",
         houseAWB: "",
+        airlineCode: "", // new
+        masterBillNumber: "", // new
     });
 
-    const [combineFile, setCombineFile] = useState(null);
+    const [manifestFile, setManifestFile] = useState(null);
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
 
     const handleInputChange = (e) =>
         setForm({ ...form, [e.target.name]: e.target.value });
 
-    const handleFileChange = (e) => setCombineFile(e.target.files[0]);
+    const handleFileChange = (e) => setManifestFile(e.target.files[0]);
 
     const handleSubmit = async () => {
-        if (!combineFile) {
-            alert("Please upload the Combine invoice file.");
+        if (!manifestFile) {
+            alert("Please upload the Manifest file.");
             return;
         }
 
@@ -30,17 +32,18 @@ function TemuUploadPage() {
         setStatus("");
 
         try {
-            const fd = new FormData();
-            fd.append("combine", combineFile);
-            fd.append("form", JSON.stringify(form));
             const localUrl = "http://localhost:5000/api/convert";
             const onlineUrl =
                 "https://temu-server-production.up.railway.app/api/convert";
+            const fd = new FormData();
+            fd.append("manifest", manifestFile);
+            fd.append("form", JSON.stringify(form));
+
             const response = await axios.post(onlineUrl, fd, {
                 responseType: "blob",
             });
 
-            // read filename from header
+            // extract filename from headers
             const cd = response.headers["content-disposition"];
             let filename = "download.xlsx";
             if (cd) {
@@ -70,7 +73,7 @@ function TemuUploadPage() {
             <h3 className="mb-4">Temu Upload Generator</h3>
 
             <div className="mb-3">
-                <label className="form-label">Combine Invoice File</label>
+                <label className="form-label">Manifest File</label>
                 <input
                     type="file"
                     className="form-control"
@@ -93,12 +96,14 @@ function TemuUploadPage() {
                 {[
                     {
                         name: "portCode",
-                        label: "Port Code (used for Unlading/Arrival/Remote)",
+                        label: "Port Code (for Unlading/Arrival/Remote)",
                     },
                     { name: "destinationState", label: "State of Destination" },
                     { name: "carrierCode", label: "Carrier Code" },
                     { name: "voyageFlightNo", label: "Voyage Flight No" },
                     { name: "houseAWB", label: "House AWB" },
+                    { name: "airlineCode", label: "Airline Code (3-digit)" }, // new
+                    { name: "masterBillNumber", label: "Master Bill Number" }, // new
                 ].map(({ name, label }) => (
                     <div className="col-md-6 mb-3" key={name}>
                         <label className="form-label">{label}</label>
