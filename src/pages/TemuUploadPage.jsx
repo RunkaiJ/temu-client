@@ -62,7 +62,14 @@ function TemuUploadPage() {
             setStatus("✅ File successfully generated and downloaded.");
         } catch (err) {
             console.error(err);
-            setStatus("❌ Failed to generate file. Please check your inputs.");
+            let message =
+                "❌ Failed to generate file. Please check your inputs.";
+
+            if (err.response && err.response.data && err.response.data.error) {
+                message = `❌ ${err.response.data.error}`;
+            }
+
+            setStatus(message);
         } finally {
             setLoading(false);
         }
